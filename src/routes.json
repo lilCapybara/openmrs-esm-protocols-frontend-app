@@ -8,5 +8,24 @@
     }
   ],
   "extensions": [
+    {
+      "name": "protocolos-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "component": "protocolosDashboardLink",
+      "privileges": [
+        "Get Protocolos"
+      ],
+      "meta": {
+        "name": "protocolos",
+        "slot": "protocolos-dashboard-slot",
+        "title": "Protocolos"
+      },
+      "order": 10
+    },
+    {
+      "name": "protocolos-dashboard",
+      "slot": "protocolos-dashboard-slot",
+      "component": "protocolosDashboard"
+    }
   ]
 }
