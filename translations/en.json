@@ -1,4 +1,4 @@
 {
-  "welcomeToModule": "Welcome to protocols-frontend-app!",
-  "getStarted": "Get started by adding routes, extensions, or components."
+  "protocolosDescription": "Browse the care protocols of the residence.",
+  "protocolosHeading": "Institutional protocols"
 }

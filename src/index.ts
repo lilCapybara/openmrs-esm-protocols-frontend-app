@@ -3,7 +3,7 @@ import { configSchema } from './config-schema';
 import { moduleName } from './constants';
 
 const options = {
-  featureName: 'protocols-frontend-app',
+  featureName: 'protocolos',
   moduleName,
 };
 
@@ -21,4 +21,3 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 // Modals
 
 // Workspaces
-

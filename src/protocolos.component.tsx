@@ -10,11 +10,9 @@ const Protocolos: React.FC = () => {
     <div className={styles.container}>
       <Layer>
         <Tile className={styles.tile}>
-          <h1 className={styles.heading}>
-            {t('protocolosHeading', 'Protocolos')}
-          </h1>
+          <h1 className={styles.heading}>{t('protocolosHeading', 'Protocolos institucionales')}</h1>
           <p className={styles.content}>
-            {t('protocolosDescription', 'Welcome to the Protocolos page.')}
+            {t('protocolosDescription', 'Consulte los protocolos de atención de la residencia.')}
           </p>
         </Tile>
       </Layer>
