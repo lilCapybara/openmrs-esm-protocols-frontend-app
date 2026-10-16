@@ -34,3 +34,13 @@ lerna-debug.log*
 # OS
 Thumbs.db
 
+# Yarn (Berry): solo se versiona la configuracion, no la cache ni el estado local
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Cache de ESLint (lint-staged)
+.eslintcache
