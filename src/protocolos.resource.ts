@@ -44,3 +44,33 @@ export function formatearTamanio(bytes: number | null) {
   }
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+export const PRIV_MANAGE_PROTOCOLOS = 'Manage Protocolos';
+
+/** 20 MB, igual que el límite del backend */
+export const TAMANIO_MAXIMO_BYTES = 20 * 1024 * 1024;
+
+export const EXTENSIONES_PERMITIDAS = ['.pdf', '.png', '.jpg', '.jpeg', '.doc', '.docx'];
+
+/** Sube un protocolo (multipart). Solo funciona si el usuario tiene "Manage Protocolos". */
+export function subirProtocolo(archivo: File, titulo: string, descripcion: string) {
+  const formData = new FormData();
+  formData.append('file', archivo);
+  formData.append('titulo', titulo);
+  if (descripcion) {
+    formData.append('descripcion', descripcion);
+  }
+  // Con FormData, openmrsFetch no fuerza JSON y el navegador arma el multipart solo
+  return openmrsFetch<Protocolo>(`${protocolosUrl}/upload`, { method: 'POST', body: formData });
+}
+
+/** Borrado lógico: el protocolo deja de aparecer en la lista */
+export function eliminarProtocolo(uuid: string) {
+  return openmrsFetch(`${protocolosUrl}/${uuid}`, { method: 'DELETE' });
+}
+
+/** Extrae el mensaje de error que manda el backend (si lo hay) */
+export function mensajeDeError(error: unknown): string {
+  const e = error as { responseBody?: { error?: { message?: string } }; message?: string };
+  return e?.responseBody?.error?.message ?? e?.message ?? '';
+}

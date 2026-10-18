@@ -25,3 +25,16 @@
   text-align: center;
   padding: layout.$spacing-07;
 }
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}

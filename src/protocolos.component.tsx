@@ -6,6 +6,7 @@ import {
   DataTableSkeleton,
   InlineNotification,
   Layer,
+  Modal,
   Table,
   TableBody,
   TableCell,
@@ -18,15 +19,31 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { View } from '@carbon/react/icons';
-import { formatDate } from '@openmrs/esm-framework';
-import { formatearTamanio, urlArchivo, useProtocolos } from './protocolos.resource';
+import { Add, TrashCan, View } from '@carbon/react/icons';
+import { formatDate, showSnackbar, useSession, userHasAccess } from '@openmrs/esm-framework';
+import {
+  PRIV_MANAGE_PROTOCOLOS,
+  type Protocolo,
+  eliminarProtocolo,
+  formatearTamanio,
+  mensajeDeError,
+  urlArchivo,
+  useProtocolos,
+} from './protocolos.resource';
+import SubirProtocolo from './subir-protocolo.component';
 import styles from './protocolos.scss';
 
 const Protocolos: React.FC = () => {
   const { t } = useTranslation();
-  const { protocolos, error, isLoading } = useProtocolos();
+  const session = useSession();
+  const { protocolos, error, isLoading, mutate } = useProtocolos();
   const [busqueda, setBusqueda] = useState('');
+  const [subiendo, setSubiendo] = useState(false);
+  const [aEliminar, setAEliminar] = useState<Protocolo | null>(null);
+  const [eliminando, setEliminando] = useState(false);
+
+  // Solo cambia lo que se muestra; la seguridad real la aplica el backend
+  const puedeGestionar = Boolean(session?.user && userHasAccess(PRIV_MANAGE_PROTOCOLOS, session.user));
 
   // Filtro en el navegador por título o descripción (la lista es chica)
   const filtrados = useMemo(() => {
@@ -38,6 +55,31 @@ const Protocolos: React.FC = () => {
       (p) => p.titulo.toLowerCase().includes(termino) || (p.descripcion ?? '').toLowerCase().includes(termino),
     );
   }, [protocolos, busqueda]);
+
+  const confirmarEliminacion = async () => {
+    if (!aEliminar) {
+      return;
+    }
+    setEliminando(true);
+    try {
+      await eliminarProtocolo(aEliminar.uuid);
+      showSnackbar({
+        kind: 'success',
+        title: t('protocoloEliminado', 'Protocolo eliminado'),
+        subtitle: aEliminar.titulo,
+      });
+      setAEliminar(null);
+      mutate();
+    } catch (e) {
+      showSnackbar({
+        kind: 'error',
+        title: t('errorEliminando', 'No se pudo eliminar el protocolo'),
+        subtitle: mensajeDeError(e),
+      });
+    } finally {
+      setEliminando(false);
+    }
+  };
 
   const headers = [
     { key: 'titulo', header: t('titulo', 'Título') },
@@ -54,16 +96,29 @@ const Protocolos: React.FC = () => {
     archivo: `${p.nombreArchivo} (${formatearTamanio(p.tamanioBytes)})`,
     fecha: p.fechaCreacion ? formatDate(new Date(p.fechaCreacion), { mode: 'standard', time: false }) : '',
     acciones: (
-      <Button
-        kind="ghost"
-        size="sm"
-        renderIcon={View}
-        href={urlArchivo(p.uuid)}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {t('ver', 'Ver')}
-      </Button>
+      <div className={styles.acciones}>
+        <Button
+          kind="ghost"
+          size="sm"
+          renderIcon={View}
+          href={urlArchivo(p.uuid)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t('ver', 'Ver')}
+        </Button>
+        {puedeGestionar && (
+          <Button
+            kind="danger--ghost"
+            size="sm"
+            hasIconOnly
+            renderIcon={TrashCan}
+            iconDescription={t('eliminar', 'Eliminar')}
+            tooltipPosition="left"
+            onClick={() => setAEliminar(p)}
+          />
+        )}
+      </div>
     ),
   }));
 
@@ -95,6 +150,11 @@ const Protocolos: React.FC = () => {
                     placeholder={t('buscarProtocolo', 'Buscar por título o descripción')}
                     onChange={(e) => setBusqueda(typeof e === 'string' ? e : e.target.value)}
                   />
+                  {puedeGestionar && (
+                    <Button kind="primary" renderIcon={Add} onClick={() => setSubiendo(true)}>
+                      {t('subirProtocolo', 'Subir protocolo')}
+                    </Button>
+                  )}
                 </TableToolbarContent>
               </TableToolbar>
               <Table {...getTableProps()}>
@@ -129,6 +189,39 @@ const Protocolos: React.FC = () => {
             </TableContainer>
           )}
         </DataTable>
+      )}
+
+      {puedeGestionar && (
+        <>
+          <SubirProtocolo
+            abierto={subiendo}
+            onCerrar={() => setSubiendo(false)}
+            onSubido={() => {
+              setSubiendo(false);
+              mutate();
+            }}
+          />
+          <Modal
+            danger
+            open={Boolean(aEliminar)}
+            modalHeading={t('eliminarProtocolo', 'Eliminar protocolo')}
+            primaryButtonText={eliminando ? t('eliminando', 'Eliminando...') : t('eliminar', 'Eliminar')}
+            secondaryButtonText={t('cancelar', 'Cancelar')}
+            primaryButtonDisabled={eliminando}
+            onRequestSubmit={confirmarEliminacion}
+            onRequestClose={() => setAEliminar(null)}
+          >
+            <p>
+              {t(
+                'confirmarEliminar',
+                '¿Seguro que querés eliminar "{{titulo}}"? Dejará de estar visible para el personal.',
+                {
+                  titulo: aEliminar?.titulo ?? '',
+                },
+              )}
+            </p>
+          </Modal>
+        </>
       )}
     </div>
   );
