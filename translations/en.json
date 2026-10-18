@@ -1,5 +1,14 @@
 {
+  "archivo": "File",
+  "buscarProtocolo": "Search by title or description",
+  "descripcion": "Description",
+  "errorCargando": "Protocols could not be loaded",
+  "fechaCarga": "Upload date",
   "protocolos": "Protocols",
   "protocolosDescription": "Browse the care protocols of the residence.",
-  "protocolosHeading": "Institutional protocols"
+  "protocolosHeading": "Institutional protocols",
+  "sinProtocolos": "No protocols have been uploaded yet.",
+  "sinResultados": "No protocol matches the search.",
+  "titulo": "Title",
+  "ver": "View"
 }

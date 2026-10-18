@@ -1,5 +1,14 @@
 {
+  "archivo": "Archivo",
+  "buscarProtocolo": "Buscar por título o descripción",
+  "descripcion": "Descripción",
+  "errorCargando": "No se pudieron cargar los protocolos",
+  "fechaCarga": "Fecha de carga",
   "protocolos": "Protocolos",
   "protocolosDescription": "Consulte los protocolos de atención de la residencia.",
-  "protocolosHeading": "Protocolos institucionales"
+  "protocolosHeading": "Protocolos institucionales",
+  "sinProtocolos": "Todavía no hay protocolos cargados.",
+  "sinResultados": "Ningún protocolo coincide con la búsqueda.",
+  "titulo": "Título",
+  "ver": "Ver"
 }
